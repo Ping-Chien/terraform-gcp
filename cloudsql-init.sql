@@ -1,0 +1,6 @@
+USE counter;
+
+CREATE TABLE IF NOT EXISTS counter (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    number INT NOT NULL
+);

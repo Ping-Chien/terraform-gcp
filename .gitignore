@@ -1,0 +1,31 @@
+# Ignore credential files and sensitive data
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+.terraform/
+
+# Ignore common credential and secret file patterns
+*.pem
+*.key
+*.crt
+*.p12
+*.cer
+*.der
+*.jks
+*.env
+.env.*
+credentials*
+secrets*
+
+# Ignore IDE and OS files
+
+# Ignore Google Cloud SDK config directory
+.config/gcloud/
+
+# Ignore Cloud SQL config directory
+.config/cloudsql/
+.DS_Store
+.idea/
+.vscode/
+.terraform.lock.hcl
