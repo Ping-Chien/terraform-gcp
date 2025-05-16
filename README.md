@@ -4,7 +4,7 @@
 - 一個 GKE (Kubernetes) Cluster
 - 一個 Cloud SQL Instance（名稱 tracing-test）
 - 一個名為 counter 的資料庫，內有 counter table（欄位：id, number）
-- 一個名為 tracing 的 Artifact Registry Repository
+- 一個名為 app-image-repo 的 Artifact Registry Repository
 
 ---
 

@@ -12,6 +12,12 @@ spec:
       labels:
         app: app1
     spec:
+      initContainers:
+        - name: init-download-agent
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/javaagent:2.16.0
+          volumeMounts:
+            - mountPath: "/mnt/agent"
+              name: agent-volume
       containers:
       - name: app
         image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:latest
@@ -29,6 +35,9 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
+      volumes:
+        - name: agent-volume
+          emptyDir: {}
 
       # Cloud SQL Proxy sidecar
       - name: cloud-sql-proxy
