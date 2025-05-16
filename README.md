@@ -73,13 +73,13 @@ terraform init
 terraform apply
 ```
 
-> 注意事項：
-> 建立資料庫 Table(此步驟透過terraform自動執行)
-> 連線到 Cloud SQL，執行 `cloudsql-init.sql` 來建立 table。
-> **連線mysql client時，仍然需要手動輸入密碼，terminal會提示Enter password**
+### 4. 建立資料庫 Table
+> 建立資料庫 Table，必須到 Cloud SQL Instance 的Cloud SQL studio 執行
+執行 `cloudsql-init.sql` 
 
 
-### 4. 推送 Docker 映像檔到 Artifact Registry
+
+### 5. 推送 Docker 映像檔到 Artifact Registry
 請直接執行 `push-image-to-artifact-registry.sh` 腳本：
 ```bash
 ./sh/push-image-to-artifact-registry.sh
@@ -93,22 +93,26 @@ terraform apply
 > 請先在腳本內設定好 PROJECT_ID、REGION、REPO、IMAGE_NAME 等參數，或根據需求修改腳本內容。
 
 
-### 5. 部署應用程式到 GKE
+### 6. 部署應用程式到 GKE，透過cloud shell 執行
+> 請先查詢cloud shell ip
+`curl ifconfig.me`
+>填寫到gke cluster(補圖)
+>將相關腳本上傳到cloud shell
 請執行 `deploy-to-gke.sh`，內容如下：
 ```bash
-./sh/deploy-to-gke.sh
+./deploy-to-gke.sh
 ```
 
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
-### 6. 發送request
+### 7. 發送request
 ```bash
 kubectl get pods
 kubectl exec -it ${POD_NAME 進入app1} -- /bin/sh
 curl http://127.0.0.1:8080/call-other
 ```
 
-### 7. 測試完成請刪除執行個體(節費)
+### 8. 測試完成請刪除執行個體(節費)
 ```hcl
 terraform destroy
 ```
