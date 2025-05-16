@@ -116,6 +116,12 @@ curl http://127.0.0.1:8080/call-other
 ```hcl
 terraform destroy
 ```
+> 刪除VPC會發生錯誤，需要到GCP Console刪除“虛擬私有雲網路對接”，再執行一次
+
+![錯誤訊息](attachments/Screenshot%202025-05-16%20at%2010.09.51%E2%80%AFPM.png)
+
+![虛擬私有雲網路對接](attachments/Screenshot%202025-05-16%20at%2010.12.19%E2%80%AFPM.png)
+
 ---
 
 ## 注意事項
@@ -135,10 +141,5 @@ terraform destroy
 ### 刪除專案
 Unable to remove Service Networking Connection ... Failed to delete connection; Producer services (e.g. CloudSQL, Cloud Memstore, etc.) are still using this connection.
 
-這是 GCP 的資源依賴保護機制，必須先刪除所有使用者（Producer）服務，才能刪掉 peering。
-請先確保 Cloud SQL/Memorystore 都已刪除，然後再移除 Service Networking Connection。
 
-如果你需要具體的 Terraform 操作順序或 destroy 指令，請告訴我你的現有資源狀態，我可以給你詳細步驟！
-
-terraform destroy -target=google_sql_database.counter -target=google_sql_user.root -target=google_sql_database_instance.default
 
