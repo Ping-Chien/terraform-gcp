@@ -3,6 +3,23 @@ resource "google_container_cluster" "primary" {
   location = var.region
   enable_autopilot = true
   deletion_protection = false
+  network    = google_compute_network.tracing-vpc.id
+
+  # 私有集群設定 
+  private_cluster_config { 
+    enable_private_nodes = true
+    enable_private_endpoint = true
+    master_ipv4_cidr_block = "172.16.0.0/28"
+  }
+
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = "0.0.0.0/0"
+      display_name = "all"
+    }
+  }
+
+  depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
 provider "kubernetes" {

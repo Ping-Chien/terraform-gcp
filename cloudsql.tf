@@ -9,6 +9,10 @@ resource "google_sql_database_instance" "default" {
     disk_size = 10       # 最小磁碟空間（GB）
     disk_autoresize = false
     activation_policy = "ALWAYS"
+    ip_configuration {
+      ipv4_enabled    = false
+      private_network = google_compute_network.tracing-vpc.id
+    }
   }
 }
 
@@ -27,7 +31,7 @@ resource "google_sql_user" "root" {
 }
 
 # 連線mysql時，還是要在terminal輸入密碼，不接受指令帶入
-resource "null_resource" "init_cloudsql_schema" {
+/*resource "null_resource" "init_cloudsql_schema" {
   provisioner "local-exec" {
     command = <<EOT
       MYSQL_PWD=${var.db_password} gcloud sql connect ${google_sql_database_instance.default.name} \
@@ -40,3 +44,4 @@ resource "null_resource" "init_cloudsql_schema" {
     }
   }
 }
+*/

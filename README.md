@@ -19,11 +19,12 @@
 
 ## GCP 啟用服務API
 請至 GCP Console `API & Services`啟用以下 API：
-- Artifact Registry
-- Cloud SQL
-- Cloud SQL Admin
-- Compute Engine
-- Kubernetes Engine
+- Artifact Registry API
+- Cloud SQL API
+- Cloud SQL Admin API
+- Compute Engine API
+- Kubernetes Engine API
+- Service Networking API
 
 ## GCP 認證設定
 1. 請至 GCP Console 建立具備必要權限的 Service Account，並產生金鑰（JSON 檔）。
@@ -36,6 +37,7 @@ service account 必須具備以下role
 - 服務帳戶管理員：roles/iam.serviceAccountAdmin
 - 服務帳戶金鑰管理員：roles/iam.serviceAccountKeyAdmin
 - 服務帳戶使用者：roles/iam.serviceAccountUser
+- 網路管理員：roles/compute.networkViewer
 2. 將下載的金鑰檔案放置於 `.config/gcloud/` 目錄下，例如：`.config/gcloud/${下載的credentials檔名}.json`
 3. 確認 `variables.tf` 內 provider 的 credentials 路徑與檔名一致：
    ```hcl
@@ -61,7 +63,11 @@ region = "<你的 GCP region>"
 gcp_credentials_file = "<你的 GCP credentials json file路徑>"
 ```
 
-### 2. 初始化與部署基礎設施
+### 2. terminal登入gcloud
+```bash
+gcloud auth login
+```
+### 3. 初始化與部署基礎設置
 ```bash
 terraform init
 terraform apply
@@ -73,7 +79,7 @@ terraform apply
 > **連線mysql client時，仍然需要手動輸入密碼，terminal會提示Enter password**
 
 
-### 3. 推送 Docker 映像檔到 Artifact Registry
+### 4. 推送 Docker 映像檔到 Artifact Registry
 請直接執行 `push-image-to-artifact-registry.sh` 腳本：
 ```bash
 ./sh/push-image-to-artifact-registry.sh
@@ -115,8 +121,20 @@ terraform destroy
 ---
 
 ## 參考檔案
-- `main.tf`、`gke.tf`、`artifact-registry.tf`、`cloudsql.tf`：Terraform 配置
+- `main.tf`、`gke.tf`、`artifact-registry.tf`、`cloudsql.tf`、`vpc.tf`：Terraform 配置
 - `yaml/app1-deployment.yaml`、`yaml/app1-service.yaml`、`yaml/app2-deployment.yaml`、`yaml/app2-service.yaml`：Kubernetes 部署檔
 - `sh/deploy-to-gke.sh`：自動化部署pod腳本
 - `sh/push-image-to-artifact-registry.sh`：推送映像檔腳本
 - `cloudsql-init.sql`：初始化資料庫 SQL
+
+---
+### 刪除專案
+Unable to remove Service Networking Connection ... Failed to delete connection; Producer services (e.g. CloudSQL, Cloud Memstore, etc.) are still using this connection.
+
+這是 GCP 的資源依賴保護機制，必須先刪除所有使用者（Producer）服務，才能刪掉 peering。
+請先確保 Cloud SQL/Memorystore 都已刪除，然後再移除 Service Networking Connection。
+
+如果你需要具體的 Terraform 操作順序或 destroy 指令，請告訴我你的現有資源狀態，我可以給你詳細步驟！
+
+terraform destroy -target=google_sql_database.counter -target=google_sql_user.root -target=google_sql_database_instance.default
+
