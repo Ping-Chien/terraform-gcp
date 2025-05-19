@@ -13,11 +13,10 @@
 - [Terraform](https://developer.hashicorp.com/terraform/downloads)
 - [gcloud CLI](https://cloud.google.com/sdk/docs/install)（需額外安裝 GKE plugin，可用指令：`gcloud components install gke-gcloud-auth-plugin`）
 - [Docker](https://docs.docker.com/get-docker/)
-- [MySQL Client](https://dev.mysql.com/downloads/mysql/)（用於連線 Cloud SQL 建立資料表）
 
 ---
 
-## GCP 啟用服務API
+## GCP 啟用服務API(GCP Lab已啟用)
 請至 GCP Console `API & Services`啟用以下 API：
 - Artifact Registry API
 - Cloud SQL API
@@ -26,7 +25,7 @@
 - Kubernetes Engine API
 - Service Networking API
 
-## GCP 認證設定
+## GCP 認證設定(GCP Lab已設定，service account= terraform-tracing-creator@cloud-sre-poc-447001.iam.gserviceaccount.com，請下載新的金鑰)
 1. 請至 GCP Console 建立具備必要權限的 Service Account，並產生金鑰（JSON 檔）。
 service account 必須具備以下role
 - Artifact Registry 管理員：roles/artifactregistry.admin
@@ -38,7 +37,10 @@ service account 必須具備以下role
 - 服務帳戶金鑰管理員：roles/iam.serviceAccountKeyAdmin
 - 服務帳戶使用者：roles/iam.serviceAccountUser
 - 網路管理員：roles/compute.networkViewer
-2. 將下載的金鑰檔案放置於 `.config/gcloud/` 目錄下，例如：`.config/gcloud/${下載的credentials檔名}.json`
+- 網路安全管理員：roles/compute.securityAdmin
+
+2. 將下載的金鑰檔案放置於此專案 `.config/gcloud/` 目錄下，例如：`.config/gcloud/${下載的credentials檔名}.json`
+
 3. 確認 `variables.tf` 內 provider 的 credentials 路徑與檔名一致：
    ```hcl
    variable "gcp_credentials_file" {
@@ -75,12 +77,12 @@ terraform apply
 
 ### 4. 建立資料庫 Table
 > 建立資料庫 Table，必須到 Cloud SQL Instance 的Cloud SQL studio 執行
+>手動建立 user/user 執行以下SQL
 執行 `cloudsql-init.sql` 
 
 
-
-### 5. 推送 Docker 映像檔到 Artifact Registry
-請直接執行 `push-image-to-artifact-registry.sh` 腳本：
+### 5. 推送 Docker 映像檔到 Artifact Registry(必須先將tracing-test專案的image打包好)
+請在此專案跟目錄直接執行 `push-image-to-artifact-registry.sh` 腳本：
 ```bash
 ./sh/push-image-to-artifact-registry.sh
 ```
@@ -94,18 +96,34 @@ terraform apply
 
 
 ### 6. 部署應用程式到 GKE，透過cloud shell 執行
-> 請先查詢cloud shell ip
+> 請先到web console 查詢 cloud shell ip
+
 `curl ifconfig.me`
->填寫到gke cluster(補圖)
->將相關腳本上傳到cloud shell
-請執行 `deploy-to-gke.sh`，內容如下：
+
+![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.23.14 AM.png)
+
+>填寫到gke cluster，讓GKE允許來自cloud shell的ip
+
+![gke cluster](attachments/Screenshot 2025-05-19 at 7.26.55 AM.png)
+![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.27.05 AM.png)
+
+>將以下相關腳本上傳到cloud shell
+>.config/gcloudsql/cloudsql-sa-key.json
+>sh/deploy-to-gke.sh
+>yaml/*
+在 cloud shell執行 `deploy-to-gke.sh`，內容如下：
 ```bash
 ./deploy-to-gke.sh
 ```
+![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.54.47 AM.png)
 
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
-### 7. 發送request
+### 7. 測試
+gke會部署兩個workload，一個app1，一個app2
+測試方式為進入app1，然後呼叫app1的api /call-other
+然後 app1 會呼叫 app2 的 api /counter，寫入一筆記錄到cloud sql
+目的要確認 app1 -> app2 -> cloud sql 的流程是否正常，被正常記錄到gcp tracing 
 ```bash
 kubectl get pods
 kubectl exec -it ${POD_NAME 進入app1} -- /bin/sh
@@ -116,7 +134,7 @@ curl http://127.0.0.1:8080/call-other
 ```hcl
 terraform destroy
 ```
-> 刪除VPC會發生錯誤，需要到GCP Console刪除“虛擬私有雲網路對接”，再執行一次
+> 刪除VPC會發生錯誤，需要到GCP Console刪除“虛擬私有雲網路對接"，再執行一次
 
 ![錯誤訊息](attachments/Screenshot%202025-05-16%20at%2010.09.51%E2%80%AFPM.png)
 
@@ -136,10 +154,6 @@ terraform destroy
 - `sh/deploy-to-gke.sh`：自動化部署pod腳本
 - `sh/push-image-to-artifact-registry.sh`：推送映像檔腳本
 - `cloudsql-init.sql`：初始化資料庫 SQL
-
----
-### 刪除專案
-Unable to remove Service Networking Connection ... Failed to delete connection; Producer services (e.g. CloudSQL, Cloud Memstore, etc.) are still using this connection.
 
 
 
