@@ -29,8 +29,8 @@ resource "google_compute_firewall" "allow_gke_to_cloudsql" {
     ports    = ["3306"]
   }
 
-  source_ranges      = ["10.0.0.0/16"]  # GKE 節點 subnet CIDR，請依實際調整
-  destination_ranges = ["10.0.0.0/24"]  # Cloud SQL subnet CIDR，請依實際調整
+  source_ranges      = ["0.0.0.0/0"]  # GKE 節點 subnet CIDR，請依實際調整
+  destination_ranges = ["0.0.0.0/0"]  # Cloud SQL subnet CIDR，請依實際調整
 
   description = "Allow GKE nodes to access Cloud SQL over private IP"
   priority    = 1000
