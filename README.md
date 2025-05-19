@@ -100,12 +100,12 @@ terraform apply
 
 `curl ifconfig.me`
 
-![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.23.14 AM.png)
+<img src="attachments/Screenshot%202025-05-19%20at%207.23.14%E2%80%AFAM.png" alt="cloud shell ip" width="700" />
 
 >填寫到gke cluster，讓GKE允許來自cloud shell的ip
 
-![gke cluster](attachments/Screenshot 2025-05-19 at 7.26.55 AM.png)
-![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.27.05 AM.png)
+<img src="attachments/Screenshot%202025-05-19%20at%207.26.55%E2%80%AFAM.png" alt="gke cluster" width="700" />
+<img src="attachments/Screenshot%202025-05-19%20at%207.27.05%E2%80%AFAM.png" alt="cloud shell ip" width="700" />
 
 >將以下相關腳本上傳到cloud shell
 >.config/gcloudsql/cloudsql-sa-key.json
@@ -115,7 +115,7 @@ terraform apply
 ```bash
 ./deploy-to-gke.sh
 ```
-![cloud shell ip](attachments/Screenshot 2025-05-19 at 7.54.47 AM.png)
+<img src="attachments/Screenshot%202025-05-19%20at%207.54.47%E2%80%AFAM.png" alt="cloud shell ip" width="700" />
 
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
