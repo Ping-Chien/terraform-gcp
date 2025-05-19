@@ -108,10 +108,14 @@ terraform apply
 <img src="attachments/Screenshot%202025-05-19%20at%207.27.05%E2%80%AFAM.png" alt="cloud shell ip" width="700" />
 
 >將以下相關腳本上傳到cloud shell
+
 >.config/gcloudsql/cloudsql-sa-key.json
+
 >sh/deploy-to-gke.sh
+
 >yaml/*
-在 cloud shell執行 `deploy-to-gke.sh`，內容如下：
+
+>在 cloud shell執行 `deploy-to-gke.sh`，內容如下：
 ```bash
 ./deploy-to-gke.sh
 ```
@@ -120,10 +124,10 @@ terraform apply
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
 ### 7. 測試
-gke會部署兩個workload，一個app1，一個app2
-測試方式為進入app1，然後呼叫app1的api /call-other
-然後 app1 會呼叫 app2 的 api /counter，寫入一筆記錄到cloud sql
-目的要確認 app1 -> app2 -> cloud sql 的流程是否正常，被正常記錄到gcp tracing 
+>gke會部署兩個workload，一個app1，一個app2
+>測試方式為進入app1，呼叫app1的api /call-other
+>然後 app1 會呼叫 app2 的 api /counter，寫入一筆記錄到cloud >sql
+>目的要確認 app1 -> app2 -> cloud sql 的流程是否正常，被正常記錄到gcp tracing 
 ```bash
 kubectl get pods
 kubectl exec -it ${POD_NAME 進入app1} -- /bin/sh
