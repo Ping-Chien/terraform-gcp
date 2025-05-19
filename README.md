@@ -124,9 +124,12 @@ terraform apply
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
 ### 7. 測試
->gke會部署兩個workload，一個app1，一個app2
->測試方式為進入app1，呼叫app1的api /call-other
->然後 app1 會呼叫 app2 的 api /counter，寫入一筆記錄到cloud >sql
+>gke會部署兩個workload，一個app1，一個app2，
+
+>測試方式為進入app1，呼叫app1的api /call-other，
+
+>然後 app1 會呼叫 app2 的 api /counter，寫入一筆記錄到cloud >sql，
+
 >目的要確認 app1 -> app2 -> cloud sql 的流程是否正常，被正常記錄到gcp tracing 
 ```bash
 kubectl get pods
