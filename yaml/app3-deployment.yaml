@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      labels:
+        app: app3
+    spec:
+      # 共享 volume
+      volumes:
+        - name: agent-volume
+          emptyDir: {}
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-sa-key
+      # init container
+      initContainers:
+        - name: init-download-agent
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/javaagent:2.16.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp /opentelemetry-javaagent.jar /mnt/agent/opentelemetry-javaagent.jar
+          volumeMounts:
+            - name: agent-volume
+              mountPath: /mnt/agent          
+      containers:
+        - name: app
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori
+          env:
+            - name: DB_HOST
+              value: 127.0.0.1
+            - name: DB_PORT
+              value: "3306"
+            # Java Agent
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/mnt/agent/opentelemetry-javaagent.jar"
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "60000"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+              value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
+            - name: OTEL_METRICS_EXPORTER
+              value: "otlp"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "service.name=spring-boot-monitoring-lab,service.version=1.0,gcp.log_name=my-java-log"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_LOGS_EXPORTER
+              value: "otlp"
+            - name: OTEL_JAVAAGENT_DEBUG
+              value: "true"
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: agent-volume
+              mountPath: /mnt/agent
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.35.4
+          command: ["/cloud_sql_proxy"]
+          args:
+            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:3306"
+            - "-credential_file=/secrets/cloudsql/credentials.json"
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10

@@ -15,12 +15,11 @@ kubectl create secret generic cloudsql-sa-key --from-file=credentials.json=cloud
 
 
 # 部署 Deployment & Service yaml
-kubectl apply -f yaml/app1-deployment.yaml
-kubectl rollout restart deployment app1
-kubectl apply -f yaml/app1-service.yaml
-kubectl apply -f yaml/app2-deployment.yaml
-kubectl rollout restart deployment app2
-kubectl apply -f yaml/app2-service.yaml
-
+kubectl apply -f yaml/app3-deployment.yaml
+kubectl rollout restart deployment app3
+kubectl apply -f yaml/app3-service.yaml
+kubectl apply -f yaml/app4-deployment.yaml
+kubectl rollout restart deployment app4
+kubectl apply -f yaml/app4-service.yaml
 
 echo "\n已完成 GKE 部署！可用 kubectl get pods, kubectl get svc 檢查狀態。"
