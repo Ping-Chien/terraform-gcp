@@ -32,7 +32,10 @@ spec:
       containers:
         - name: app
           image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori
+          imagePullPolicy: Always
           env:
+            - name: TZ
+              value: "Asia/Taipei"
             - name: DB_HOST
               value: 127.0.0.1
             - name: DB_PORT
@@ -51,7 +54,7 @@ spec:
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=spring-boot-monitoring-lab,service.version=1.0,gcp.log_name=my-java-log"
+              value: "service.name=app3,service.version=1.0,gcp.log_name=app3-log"
             - name: OTEL_TRACES_EXPORTER
               value: "otlp"
             - name: OTEL_LOGS_EXPORTER
@@ -79,15 +82,15 @@ spec:
             - name: cloudsql-instance-credentials
               mountPath: /secrets/cloudsql
               readOnly: true
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          # readinessProbe:
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
