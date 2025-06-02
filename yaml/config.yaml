@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: opentelemetry
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: 
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+
+
+    processors:
+      batch: 
+        timeout: 60s  #增加批處理時間
+        send_batch_size: 1000  #增加批量大小
+
+
+    exporters:
+      debug:
+      googlecloud:
+        metric:
+          prefix: "custom.googleapis.com/opentelemetry/"
+          resource_filters:
+            - prefix: "k8s_container"
+        log:
+          default_log_name: "otel-logs"
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [googlecloud]
+        metrics:  
+          receivers: [otlp]
+          exporters: [googlecloud]
+        logs:
+          receivers: [otlp]
+          exporters: [googlecloud]
