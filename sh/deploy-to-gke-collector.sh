@@ -28,7 +28,7 @@ kubectl annotate serviceaccount otel-collector \
   --namespace opentelemetry \
   iam.gke.io/gcp-service-account=otel-collectort@$PROJECT_ID.iam.gserviceaccount.com
 
-cd ..
+
 kubectl apply -f yaml/ClusterRole.yaml
 kubectl apply -f yaml/config.yaml
 kubectl apply -f yaml/collector-DaemonSet.yaml
