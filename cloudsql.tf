@@ -30,6 +30,20 @@ resource "google_sql_user" "root" {
   depends_on = [google_sql_database_instance.default]
 }
 
+resource "google_sql_database" "dotnet" {
+  name     = "dotnet"
+  instance = google_sql_database_instance.default.name
+
+  depends_on = [google_sql_database_instance.default]
+}
+
+resource "google_sql_user" "dotnet" {
+  name     = "dotnet"
+  instance = google_sql_database_instance.default.name
+  password = var.dotnet_password
+  depends_on = [google_sql_database_instance.default]
+}
+
 # 連線mysql時，還是要在terminal輸入密碼，不接受指令帶入
 /*resource "null_resource" "init_cloudsql_schema" {
   provisioner "local-exec" {
