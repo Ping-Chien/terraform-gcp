@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole  # 它的權限是跨越整個 Kubernetes 叢集（所有 namespaces）
+metadata:
+  name: opentelemetry:otel-collector # ClusterRole 名稱
+  labels:
+rules:
+- apiGroups: [""] #可以對所有的Pods 執行 get list watch
+  resources:
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding #將ClusterRole綁定在opentelemetry default
+metadata:
+  name: opentelemetry:otel-collector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opentelemetry:otel-collector
+subjects:
+- kind: ServiceAccount
+  namespace: opentelemetry
+  name: otel-collector
