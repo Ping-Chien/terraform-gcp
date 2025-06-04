@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnet-backend
+spec:
+  selector:
+    app: dotnet-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer # 僅供集群內部存取，若需外部請改為 LoadBalancer

@@ -21,6 +21,16 @@ resource "google_project_iam_member" "otel_tracing" {
   member  = "serviceAccount:${google_service_account.otel_sa.email}"
 }
 
+resource "google_service_account" "dotnet_sa" {
+  account_id   = "dotnet-backend" # 這會產生 otel-svc-account@PROJECT_ID.iam.gserviceaccount.com
+  display_name = "dotnet-backend Service Account"
+}
+
+resource "google_project_iam_member" "dotnet_cloud_sql_admin" {
+  project = var.project_id
+  role    = "roles/cloudsql.admin"
+  member  = "serviceAccount:${google_service_account.dotnet_sa.email}"
+}
 
 
 
