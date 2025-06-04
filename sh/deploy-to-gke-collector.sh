@@ -14,8 +14,20 @@ CLUSTER_NAME="tracing-gke-cluster"
 #kubectl create secret generic cloudsql-sa-key --from-file=credentials.json=cloudsql-sa-key.json
 
 
+
+
 # 部署 Deployment & Service yaml
 kubectl create namespace opentelemetry
+kubectl create serviceaccount otel-collector -n opentelemetry
+
+gcloud iam service-accounts add-iam-policy-binding otel-collector@$PROJECT_ID.iam.gserviceaccount.com \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="serviceAccount:$PROJECT_ID.svc.id.goog[opentelemetry/otel-collector]"
+
+kubectl annotate serviceaccount otel-collector \
+  --namespace opentelemetry \
+  iam.gke.io/gcp-service-account=otel-collectort@$PROJECT_ID.iam.gserviceaccount.com
+
 cd ..
 kubectl apply -f yaml/ClusterRole.yaml
 kubectl apply -f yaml/config.yaml
