@@ -32,7 +32,7 @@ spec:
           echo "Copied OpenTelemetry agent files and set permissions"
       containers:
       - name: dotnet-backend
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/dotnet-backend:mysql
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/dotnet-backend:mysqlv5
         ports:
         - containerPort: 8080
         volumeMounts:
