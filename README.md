@@ -123,6 +123,10 @@ terraform apply
 
 完成後可登入gcloud用 `kubectl get pods`、`kubectl get svc` 指令檢查狀態。
 
+### 6.1 部署collector到 GKE，透過cloud shell 執行
+>sh/deploy-to-gke-collector.sh
+
+
 ### 7. 測試
 >gke會部署兩個workload，一個app1，一個app2，
 
