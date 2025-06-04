@@ -1,6 +1,6 @@
 resource "google_sql_database_instance" "default" {
   name             = "tracing"
-  database_version = "MYSQL_8_0"
+  database_version = "POSTGRES_15"
   region           = var.region
   deletion_protection = false
 
@@ -24,7 +24,7 @@ resource "google_sql_database" "counter" {
 }
 
 resource "google_sql_user" "root" {
-  name     = "root"
+  name     = "postgres"
   instance = google_sql_database_instance.default.name
   password = var.db_password
   depends_on = [google_sql_database_instance.default]

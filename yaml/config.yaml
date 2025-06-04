@@ -33,7 +33,7 @@ data:
     service:
       pipelines:
         traces:
-          receivers: [otlp]
+          receivers: [otlp,zipkin]
           exporters: [googlecloud]
         metrics:  
           receivers: [otlp]
