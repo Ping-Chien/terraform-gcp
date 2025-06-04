@@ -17,6 +17,13 @@ variable "db_password" {
   default     = "root"
 }
 
+variable "dotnet_password" {
+  description = "Cloud SQL root user password"
+  type        = string
+  sensitive   = true
+  default     = "1qaz@WSX"
+}
+
 variable "gcp_credentials_file" {
   description = "Path to GCP credentials json file"
   type        = string
