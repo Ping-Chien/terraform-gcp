@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: otel-collector
+  namespace: opentelemetry
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+      type: otel-collector
+  template:
+    metadata:
+      labels:
+        type: otel-collector
+        app: otel-collector
+    spec:
+      serviceAccountName: otel-collector
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib:latest
+        resources:
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          runAsGroup: 1001
+          runAsUser: 1001    
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - SYS_ADMIN  
+        args:
+          - "--config=/etc/otel-collector-config.yaml"
+        volumeMounts:
+          - mountPath: /etc/otel-collector-config.yaml
+            subPath: otel-collector-config.yaml
+            name: otel-config
+        ports:
+          - containerPort: 4317
+            protocol: TCP
+      volumes:
+      - name: otel-config
+        configMap:
+          name: otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: opentelemetry  # 請確保你的 otel-collector 也在這個 namespace
+  labels:
+    app: otel-collector
+spec:
+  selector:
+    app: otel-collector  # 這要對應 otel-collector Pod 的 label
+  ports:
+    - name: otlp-grpc
+      port: 4317        # 給 OpenTelemetry Protocol (OTLP) gRPC
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318        # 給 OpenTelemetry Protocol (OTLP) HTTP
+      targetPort: 4318
+      protocol: TCP
+    - name: zipkin
+      port: 9411        # 給 Zipkin
+      targetPort: 9411
+      protocol: TCP
+    - name: prometheus
+      port: 8888        # 給 Prometheus Metrics
+      targetPort: 8888
+      protocol: TCP
+  type: ClusterIP  # 內部 Cluster 內可以存取，外部無法直接訪問
