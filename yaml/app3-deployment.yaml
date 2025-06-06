@@ -21,14 +21,17 @@ spec:
             secretName: cloudsql-sa-key
       # init container
       initContainers:
-        - name: init-download-agent
-          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/javaagent:2.16.0
+        - name: otel-agent-init
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-agent-init:v1
+          volumeMounts:
+          - name: otel-agent-volume
+            mountPath: /otel-agent
           command: ["/bin/sh", "-c"]
           args:
-            - cp /opentelemetry-javaagent.jar /mnt/agent/opentelemetry-javaagent.jar
-          volumeMounts:
-            - name: agent-volume
-              mountPath: /mnt/agent          
+          - |
+            cp -r /otel-agent-init/* /otel-agent/ && \
+            chmod -R 755 /otel-agent && \
+            echo "Copied OpenTelemetry agent files and set permissions"        
       containers:
         - name: app
           image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori
@@ -42,7 +45,7 @@ spec:
               value: "5432"
             # Java Agent
             - name: JAVA_TOOL_OPTIONS
-              value: "-javaagent:/mnt/agent/opentelemetry-javaagent.jar"
+              value: "-javaagent:/otel-agent/java/opentelemetry-javaagent.jar"
             - name: OTEL_METRIC_EXPORT_INTERVAL
               value: "60000"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -70,8 +73,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           volumeMounts:
-            - name: agent-volume
-              mountPath: /mnt/agent
+            - name: otel-agent-volume
+              mountPath: /otel-agent
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.35.4
           command: ["/cloud_sql_proxy"]

@@ -1,6 +1,7 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
 import { Rate } from 'k6/metrics';
+import { htmlReport } from "./bundle.js";
 
 // Custom metric to track errors
 const errors = new Rate('errors');
@@ -29,7 +30,7 @@ export const options = {
 // Main test function
 export default function () {
   // Target endpoint
-  const url = 'http://app3.default.svc.cluster.local:8080/call-other';
+  const url = 'http://app1.default.svc.cluster.local:8080/click';
   
   // Send request
   const response = http.get(url);
@@ -46,4 +47,12 @@ export default function () {
   }
   
   // No sleep is needed as the constant-arrival-rate executor handles timing
+}
+
+// 生成 HTML 報告的函數
+export function handleSummary(data) {
+  return {
+    "/scripts/summary.html": htmlReport(data),
+    "/scripts/summary.json": JSON.stringify(data),
+  };
 }

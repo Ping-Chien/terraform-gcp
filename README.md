@@ -159,48 +159,6 @@ terraform destroy
 - 若遇到權限或認證問題，請確認 gcloud 已正確登入，且有足夠權限操作 GCP 資源。
 執行此步驟需要的service account權限
 
-### 9. 使用 Cloud Run k6 進行負載測試
-
-本專案也包含了一個部署在 Cloud Run 上的 k6 負載測試服務，可用於對 GKE pods 進行壓力測試。
-
-#### 從任何位置訪問 Cloud Run k6 服務
-
-此 Cloud Run 服務設定為公開，**可以從任何位置直接訪問**，包括 Cloud Shell。使用以下步驟調用服務：
-
-2. 直接調用 Cloud Run 服務：
-   ```bash
-   # 使用輸出的 URL 直接調用服務，不需要認證
-   curl $(terraform output -raw cloud_run_url)
-   ```
-
-3. 傳送特定的測試參數：
-   
-
-   
-   #### 從檔案讀取腳本
-   ```bash
-   # 首先將測試腳本讀取為變數
-   TEST_SCRIPT=$(cat k6_script/load_test.js)
-   
-   # 然後將腳本內容作為 JSON 參數傳遞
-   curl -H "Content-Type: application/json" \
-     -X POST \
-     -d "{\"test_script\":\"$TEST_SCRIPT\", \"vus\":10, \"duration\":\"30s\"}" \
-     $(terraform output -raw cloud_run_url)
-   ```
-
-#### 測試結果輸出
-
-k6 測試結果將以 JSON 格式輸出：
-
-1. **查看測試結果：**
-   ```bash
-   # 查看最新的 k6-load-test 服務日誌
-   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=k6-load-test" --limit=20 --format=json
-   ```
-
-2. **分析結果：** 日誌中包含被格式化為 JSON 的 k6 測試結果，包含響應時間、成功率、請求率等指標。
-
 ---
 
 ## 參考檔案
