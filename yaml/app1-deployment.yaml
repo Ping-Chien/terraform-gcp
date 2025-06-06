@@ -12,12 +12,6 @@ spec:
       labels:
         app: app1
     spec:
-      # initContainers:
-      #   - name: init-download-agent
-      #     image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/javaagent:2.16.0
-      #     volumeMounts:
-      #       - mountPath: "/mnt/agent"
-      #         name: agent-volume
       containers:
         - name: app
           image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:latest
@@ -25,7 +19,7 @@ spec:
             - name: DB_HOST
               value: 127.0.0.1
             - name: DB_PORT
-              value: "3306"
+              value: "5432"
             # 其他環境變數請補上
           ports:
             - containerPort: 8080
@@ -39,24 +33,12 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.35.4
           command: ["/cloud_sql_proxy"]
           args:
-            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:3306"
+            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
             - "-credential_file=/secrets/cloudsql/credentials.json"
           volumeMounts:
             - name: cloudsql-instance-credentials
               mountPath: /secrets/cloudsql
               readOnly: true
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
       volumes:
         - name: agent-volume
           emptyDir: {}

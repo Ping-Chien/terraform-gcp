@@ -8,6 +8,8 @@ CLUSTER_NAME="tracing-gke-cluster"
 
 # 取得 GKE 認證
  gcloud container clusters get-credentials "$CLUSTER_NAME" --region "$REGION" --project "$PROJECT_ID"
+#gcloud container clusters get-credentials "tracing-gke-cluster" --region "asia-east1" --project "cloud-sre-poc-447001"
+
 
 # 自動建立最新 cloudsql-sa-key secret（每次都覆蓋）
 kubectl delete secret cloudsql-sa-key --ignore-not-found

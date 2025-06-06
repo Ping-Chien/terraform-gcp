@@ -20,8 +20,8 @@ resource "google_service_networking_connection" "private_vpc_connection" {
 }
 
 # 允許 GKE 節點連線到 Cloud SQL 3306 port
-resource "google_compute_firewall" "allow_gke_to_cloudsql" {
-  name    = "allow-gke-to-cloudsql"
+resource "google_compute_firewall" "allow_gke_to_cloudsql_mysql" {
+  name    = "allow-gke-to-cloudsql-mysql"
   network = google_compute_network.tracing-vpc.id
 
   allow {
@@ -32,8 +32,25 @@ resource "google_compute_firewall" "allow_gke_to_cloudsql" {
   source_ranges      = ["0.0.0.0/0"]  # GKE 節點 subnet CIDR，請依實際調整
   destination_ranges = ["0.0.0.0/0"]  # Cloud SQL subnet CIDR，請依實際調整
 
-  description = "Allow GKE nodes to access Cloud SQL over private IP"
+  description = "Allow GKE nodes to access Cloud SQL MySQL over private IP"
   priority    = 1000
   direction   = "INGRESS"
 }
 
+# 允許 GKE 節點連線到 Cloud SQL 5432 port (PostgreSQL)
+resource "google_compute_firewall" "allow_gke_to_cloudsql_postgres" {
+  name    = "allow-gke-to-cloudsql-postgres"
+  network = google_compute_network.tracing-vpc.id
+
+  allow {
+    protocol = "tcp"
+    ports    = ["5432"]
+  }
+
+  source_ranges      = ["0.0.0.0/0"]  # GKE 節點 subnet CIDR，請依實際調整
+  destination_ranges = ["0.0.0.0/0"]  # Cloud SQL subnet CIDR，請依實際調整
+
+  description = "Allow GKE nodes to access Cloud SQL PostgreSQL over private IP"
+  priority    = 1000
+  direction   = "INGRESS"
+}

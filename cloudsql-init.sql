@@ -1,6 +1,6 @@
-USE counter;
+\connect counter;
 
 CREATE TABLE IF NOT EXISTS counter (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    number INT NOT NULL
+    id SERIAL PRIMARY KEY,
+    number INTEGER NOT NULL
 );

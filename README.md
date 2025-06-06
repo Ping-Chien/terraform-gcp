@@ -174,10 +174,18 @@ terraform destroy
    ```
 
 3. 傳送特定的測試參數：
+   
+
+   
+   #### 從檔案讀取腳本
    ```bash
+   # 首先將測試腳本讀取為變數
+   TEST_SCRIPT=$(cat k6_script/load_test.js)
+   
+   # 然後將腳本內容作為 JSON 參數傳遞
    curl -H "Content-Type: application/json" \
      -X POST \
-     -d '{"test_script":"console.log(\"開始壓力測試\"); import http from \"k6/http\"; export default function() { let res = http.get(\"http://app2-service:8080/counter\"); };", "vus":10, "duration":"30s"}' \
+     -d "{\"test_script\":\"$TEST_SCRIPT\", \"vus\":10, \"duration\":\"30s\"}" \
      $(terraform output -raw cloud_run_url)
    ```
 
