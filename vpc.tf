@@ -4,6 +4,27 @@ resource "google_compute_network" "tracing-vpc" {
   auto_create_subnetworks = true
 }
 
+# 創建 Cloud Router 用於 NAT Gateway
+resource "google_compute_router" "router" {
+  name    = "tracing-router"
+  region  = var.region
+  network = google_compute_network.tracing-vpc.id
+}
+
+# 創建 Cloud NAT 以允許私有 GKE 節點訪問互聯網
+resource "google_compute_router_nat" "nat" {
+  name                               = "tracing-nat"
+  router                             = google_compute_router.router.name
+  region                             = google_compute_router.router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
 # 建立 Private Service Connection
 resource "google_compute_global_address" "private_ip_address" {
   name          = "tracing-psc"

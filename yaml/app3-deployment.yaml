@@ -14,7 +14,7 @@ spec:
     spec:
       # 共享 volume
       volumes:
-        - name: agent-volume
+        - name: otel-agent-volume
           emptyDir: {}
         - name: cloudsql-instance-credentials
           secret:
@@ -62,8 +62,8 @@ spec:
               value: "otlp"
             - name: OTEL_LOGS_EXPORTER
               value: "otlp"
-            - name: OTEL_JAVAAGENT_DEBUG
-              value: "true"
+            - name: OTEL_JAVAAGENT_LOGGING
+              value: "simple"
           ports:
             - containerPort: 8080
           livenessProbe:
