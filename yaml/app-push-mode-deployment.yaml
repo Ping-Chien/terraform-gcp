@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-push-mode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-push-mode
+  template:
+    metadata:
+      labels:
+        app: app-push-mode
+    spec:
+      containers:
+        - name: app
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:push-mode
+          resources:
+            limits:
+              cpu: 250m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          env:
+            - name: DB_HOST
+              value: 127.0.0.1
+            - name: DB_PORT
+              value: "5432"
+            # 其他環境變數請補上
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 300
+            periodSeconds: 40
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 300
+            periodSeconds: 40
+            successThreshold: 1
+            timeoutSeconds: 40
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.35.4
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+          command: ["/cloud_sql_proxy"]
+          args:
+            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
+            - "-credential_file=/secrets/cloudsql/credentials.json"
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+      volumes:
+        - name: agent-volume
+          emptyDir: {}
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-sa-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-push-mode
+spec:
+  selector:
+    app: app-push-mode
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP # 僅供集群內部存取，若需外部請改為 LoadBalancer

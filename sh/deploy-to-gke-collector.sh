@@ -26,7 +26,7 @@ gcloud iam service-accounts add-iam-policy-binding otel-collector@$PROJECT_ID.ia
 
 kubectl annotate serviceaccount otel-collector \
   --namespace opentelemetry \
-  iam.gke.io/gcp-service-account=otel-collectort@$PROJECT_ID.iam.gserviceaccount.com
+  iam.gke.io/gcp-service-account=otel-collector@$PROJECT_ID.iam.gserviceaccount.com
 
 
 kubectl apply -f yaml/ClusterRole.yaml

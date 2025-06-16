@@ -20,7 +20,9 @@ data:
       batch: 
         timeout: 60s  #增加批處理時間
         send_batch_size: 1000  #增加批量大小
-
+      resourcedetection:
+        detectors: [gcp]
+        override: true
 
     exporters:
       debug:
@@ -31,6 +33,7 @@ data:
             - prefix: "k8s_container"
         log:
           default_log_name: "otel-logs"
+      googlemanagedprometheus: 
 
     service:
       pipelines:
@@ -39,7 +42,8 @@ data:
           exporters: [googlecloud]
         metrics:  
           receivers: [otlp]
-          exporters: [googlecloud]
+          processors: [batch, resourcedetection]  
+          exporters: [googlemanagedprometheus]  
         logs:
           receivers: [otlp]
           exporters: [googlecloud]

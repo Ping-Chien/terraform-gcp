@@ -14,6 +14,14 @@ resource "google_sql_database_instance" "default" {
       private_network = google_compute_network.tracing-vpc.id
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      settings[0].disk_size,
+      settings[0].pricing_plan,
+      settings[0].backup_configuration,
+    ]
+  }
 }
 
 resource "google_sql_database" "counter" {
@@ -43,19 +51,3 @@ resource "google_sql_user" "dotnet" {
   password = var.dotnet_password
   depends_on = [google_sql_database_instance.default]
 }
-
-# 連線mysql時，還是要在terminal輸入密碼，不接受指令帶入
-/*resource "null_resource" "init_cloudsql_schema" {
-  provisioner "local-exec" {
-    command = <<EOT
-      MYSQL_PWD=${var.db_password} gcloud sql connect ${google_sql_database_instance.default.name} \
-        --user=root \
-        --project=${var.project_id} \
-        --quiet < ${path.module}/cloudsql-init.sql
-    EOT
-    environment = {
-      CLOUDSDK_CORE_PROJECT = var.project_id
-    }
-  }
-}
-*/
