@@ -64,6 +64,8 @@ spec:
               value: "otlp"
             - name: OTEL_JAVAAGENT_LOGGING
               value: "simple"
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: "1.0"
           ports:
             - containerPort: 8080
           livenessProbe:
