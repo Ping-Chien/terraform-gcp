@@ -12,16 +12,22 @@ CLUSTER_NAME="tracing-gke-cluster"
 
 
 # 自動建立最新 cloudsql-sa-key secret（每次都覆蓋）
-kubectl delete secret cloudsql-sa-key --ignore-not-found
-kubectl create secret generic cloudsql-sa-key --from-file=credentials.json=cloudsql-sa-key.json
+# kubectl delete secret cloudsql-sa-key --ignore-not-found
+# kubectl create secret generic cloudsql-sa-key --from-file=credentials.json=cloudsql-sa-key.json
 
 
+# 設置基本變數
+export APP_NAME="app3"
+export IMAGE_NAME="asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori"
 # 部署 Deployment & Service yaml
-kubectl apply -f yaml/app3-deployment.yaml
-kubectl rollout restart deployment app3
-kubectl apply -f yaml/app3-service.yaml
-kubectl apply -f yaml/app4-deployment.yaml
-kubectl rollout restart deployment app4
-kubectl apply -f yaml/app4-service.yaml
+envsubst < yaml/app-javaagent-deployment.yaml | kubectl apply -f -
+kubectl rollout restart deployment ${APP_NAME}
+
+# 設置基本變數
+export APP_NAME="app4"
+export IMAGE_NAME="asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori"
+# 部署 Deployment & Service yaml
+envsubst < yaml/app-javaagent-deployment.yaml | kubectl apply -f -
+kubectl rollout restart deployment ${APP_NAME}
 
 echo "\n已完成 GKE 部署！可用 kubectl get pods, kubectl get svc 檢查狀態。"

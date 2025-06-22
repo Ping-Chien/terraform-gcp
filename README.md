@@ -77,13 +77,7 @@ terraform init
 terraform apply
 ```
 
-### 4. 建立資料庫 Table
-> 建立資料庫 Table，必須到 Cloud SQL Instance 的Cloud SQL studio 執行
->手動建立 user/user 執行以下SQL
-執行 `cloudsql-init.sql` 
-
-
-### 5. 推送 Docker 映像檔到 Artifact Registry(必須先將tracing-test專案的image打包好)
+### 4. 推送 Docker 映像檔到 Artifact Registry(必須先將tracing-test專案的image打包好)
 請在此專案跟目錄直接執行 `push-image-to-artifact-registry.sh` 腳本：
 ```bash
 ./sh/push-image-to-artifact-registry.sh
@@ -97,7 +91,7 @@ terraform apply
 > 請先在腳本內設定好 PROJECT_ID、REGION、REPO、IMAGE_NAME 等參數，或根據需求修改腳本內容。
 
 
-### 6. 部署應用程式到 GKE，透過cloud shell 執行
+### 5. 部署應用程式到 GKE，透過cloud shell 執行
 > 請先到web console 查詢 cloud shell ip
 
 `curl ifconfig.me`

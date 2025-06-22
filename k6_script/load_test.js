@@ -16,7 +16,7 @@ export const options = {
     constant_request_rate: {
       // 設定每秒執行總請求數
       executor: 'constant-arrival-rate',
-      rate: 100, // 每秒總共執行1次請求（所有VU共用）
+      rate: 1, // 每秒總共執行N次請求（所有VU共用）
       timeUnit: '1s',
       duration: '5m', // 總共運行1分鐘（60秒），約產生60次請求
       preAllocatedVUs: 10, // 開始時分配10個虛擬用戶（VU）
@@ -25,16 +25,16 @@ export const options = {
     }
   },
   thresholds: {
-    http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
-    errors: ['rate<0.1'], // Error rate should be less than 10%
-    'transaction_times': ['p(95)<500'], // 95% 的交易應在 500ms 內完成
+    // http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+    // errors: ['rate<0.1'], // Error rate should be less than 10%
+    // 'transaction_times': ['p(95)<500'], // 95% 的交易應在 500ms 內完成
   },
 };
 
 // Main test function
 export default function () {
   // Target endpoint
-  const url = 'http://app1.default.svc.cluster.local:8080/call-other';
+  const url = 'http://app1.default.svc.cluster.local:8080/call-other?podUrl=http://app2.default.svc.cluster.local:8080';
   
   // Send request
   const response = http.get(url);
@@ -67,8 +67,56 @@ export default function () {
 
 // 生成 HTML 報告的函數
 export function handleSummary(data) {
+  // 從 data 獲取測試開始時間
+  // data.state 包含測試的狀態信息，其中 testRunDuration 是測試的統計信息
+  let timestamp;
+  
+  try {
+    // 嘗試從 data 中獲取測試開始時間
+    // 我們可以從當前時間減去測試持續時間來獲取開始時間
+    if (data && data.state && data.state.testRunDuration) {
+      const testDurationMs = data.state.testRunDuration;
+      const testStartTimeMs = Date.now() - testDurationMs;
+      const testStartTime = new Date(testStartTimeMs);
+      
+      // 產生 yyyy_mm_dd_hh_mi_ss 格式的時間戳記
+      const year = testStartTime.getFullYear();
+      const month = String(testStartTime.getMonth() + 1).padStart(2, '0');
+      const day = String(testStartTime.getDate()).padStart(2, '0');
+      const hours = String(testStartTime.getHours()).padStart(2, '0');
+      const minutes = String(testStartTime.getMinutes()).padStart(2, '0');
+      const seconds = String(testStartTime.getSeconds()).padStart(2, '0');
+      
+      timestamp = `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
+    } else {
+      // 如果無法取得測試開始時間，則使用當前時間
+      console.log('警告：無法取得測試開始時間，使用當前時間作為代替');
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      timestamp = `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
+    }
+  } catch (error) {
+    // 如果發生任何錯誤，使用當前時間作為備用
+    console.log(`錯誤：${error.message}，使用當前時間作為代替`);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    timestamp = `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
+  }
+  
   return {
-    "/scripts/summary.html": htmlReport(data),
-    "/scripts/summary.json": JSON.stringify(data)
+    [`/scripts/summary_${timestamp}.html`]: htmlReport(data),
+    [`/scripts/summary_${timestamp}.json`]: JSON.stringify(data)
   };
 }

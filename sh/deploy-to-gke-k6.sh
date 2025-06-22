@@ -9,7 +9,6 @@ REGION="asia-east1"                # GKE 集群所在區域
 CLUSTER_NAME="tracing-gke-cluster"         # GKE 集群名稱
 SERVICE_ACCOUNT="k6-gcp-sa"        # GCP 服務帳號名稱
 K6_YAML_PATH="./yaml/k6-deployment.yaml"  # k6 部署清單相對路徑
-K6_1_YAML_PATH="./yaml/k6-1-deployment.yaml"  # k6_1 部署清單相對路徑
 
 # 顏色設置
 GREEN='\033[0;32m'
@@ -44,13 +43,11 @@ gcloud iam service-accounts add-iam-policy-binding \
   --member="serviceAccount:${PROJECT_ID}.svc.id.goog[default/k6-sa]" \
   --project ${PROJECT_ID}
 
+# 設置基本變數
+export K6_NAME="k6"
 # 應用 k6 部署
 echo -e "${YELLOW}部署 k6 到集群...${NC}"
-kubectl apply -f ${K6_YAML_PATH}
-
-# 應用 k6_1 部署
-echo -e "${YELLOW}部署 k6_1 到集群...${NC}"
-kubectl apply -f ${K6_1_YAML_PATH}
+envsubst < ${K6_YAML_PATH} | kubectl apply -f -
 
 echo -e "${GREEN}部署完成!${NC}"
 echo -e "${GREEN}提示: 您可以使用以下命令查看 k6 日誌:${NC}"

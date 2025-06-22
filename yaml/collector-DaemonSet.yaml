@@ -69,8 +69,4 @@ spec:
       port: 9411        # 給 Zipkin
       targetPort: 9411
       protocol: TCP
-    - name: prometheus
-      port: 8888        # 給 Prometheus Metrics
-      targetPort: 8888
-      protocol: TCP
   type: ClusterIP  # 內部 Cluster 內可以存取，外部無法直接訪問

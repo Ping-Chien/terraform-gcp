@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app3
+  name: ${APP_NAME}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app3
+      app: ${APP_NAME}
   template:
     metadata:
       labels:
-        app: app3
+        app: ${APP_NAME}
     spec:
       # 共享 volume
       volumes:
@@ -34,11 +34,16 @@ spec:
             echo "Copied OpenTelemetry agent files and set permissions"        
       containers:
         - name: app
-          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:ori
+          image: ${IMAGE_NAME}
           imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 2048m
+              memory: 2Gi
+            requests:
+              cpu: 1024m
+              memory: 1Gi
           env:
-            - name: TZ
-              value: "Asia/Taipei"
             - name: DB_HOST
               value: 127.0.0.1
             - name: DB_PORT
@@ -70,17 +75,36 @@ spec:
           ports:
             - containerPort: 8080
           livenessProbe:
+            failureThreshold: 3
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
+              scheme: HTTP
+            initialDelaySeconds: 300
+            periodSeconds: 40
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 300
+            periodSeconds: 40
+            successThreshold: 1
+            timeoutSeconds: 40
           volumeMounts:
             - name: otel-agent-volume
               mountPath: /otel-agent
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.35.4
           command: ["/cloud_sql_proxy"]
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
           args:
             - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
             - "-credential_file=/secrets/cloudsql/credentials.json"
@@ -88,3 +112,16 @@ spec:
             - name: cloudsql-instance-credentials
               mountPath: /secrets/cloudsql
               readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}
+spec:
+  selector:
+    app: ${APP_NAME}
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP # 僅供集群內部存取，若需外部請改為 LoadBalancer

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k6
+  name: ${K6_NAME}
   namespace: default
   labels:
-    app: k6
+    app: ${K6_NAME}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k6
+      app: ${K6_NAME}
   template:
     metadata:
       labels:
-        app: k6
+        app: ${K6_NAME}
     spec:
       # 使用 Workload Identity 
       serviceAccountName: k6-sa
