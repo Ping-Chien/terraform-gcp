@@ -134,7 +134,7 @@ terraform apply
 ```bash
 kubectl get pods
 kubectl exec -it ${POD_NAME 進入app1} -- /bin/sh
-curl http://127.0.0.1:8080/call-other
+curl 'http://127.0.0.1:8080/call-other?podUrl=http://${下一個被呼叫的APP_NAME}:8080'
 ```
 
 ### 8. 測試完成請刪除執行個體(節費)
