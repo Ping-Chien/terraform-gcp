@@ -20,6 +20,12 @@ data:
       batch: 
         timeout: 60s  #增加批處理時間
         send_batch_size: 1000  #增加批量大小
+      filter/ottl:
+        error_mode: ignore
+        traces:
+          span:
+            - attributes["url.path"] == "/actuator/health/readiness"
+            - attributes["url.path"] == "/actuator/health/liveness"  
 
     exporters:
       debug:
@@ -35,6 +41,7 @@ data:
       pipelines:
         traces:
           receivers: [otlp,zipkin]
+          processors: [filter/ottl, batch]
           exporters: [googlecloud]
         metrics:  
           receivers: [otlp]
