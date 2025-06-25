@@ -23,6 +23,13 @@ spec:
       initContainers:
         - name: otel-agent-init
           image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-agent-init:v1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
           volumeMounts:
           - name: otel-agent-volume
             mountPath: /otel-agent
@@ -62,7 +69,7 @@ spec:
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=app3,service.version=1.0,gcp.log_name=app3-log"
+              value: "service.name=${APP_NAME},service.version=1.0,gcp.log_name=${APP_NAME}-log"
             - name: OTEL_TRACES_EXPORTER
               value: "otlp"
             - name: OTEL_LOGS_EXPORTER
