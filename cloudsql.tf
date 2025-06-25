@@ -9,6 +9,10 @@ resource "google_sql_database_instance" "default" {
     disk_size = 10       # 最小磁碟空間（GB）
     disk_autoresize = false
     activation_policy = "ALWAYS"
+    database_flags {
+      name  = "max_connections"
+      value = "200"  # 調整為所需的連接數
+    }
     ip_configuration {
       ipv4_enabled    = false
       private_network = google_compute_network.tracing-vpc.id
