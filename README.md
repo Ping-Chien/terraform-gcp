@@ -91,7 +91,7 @@ terraform apply
 > 請先在腳本內設定好 PROJECT_ID、REGION、REPO、IMAGE_NAME 等參數，或根據需求修改腳本內容。
 
 
-### 5. 部署應用程式到 GKE，透過cloud shell 執行
+### 5.1 部署應用程式到 GKE，透過cloud shell 執行
 > 請先到web console 查詢 cloud shell ip
 
 `curl ifconfig.me`
@@ -103,14 +103,19 @@ terraform apply
 <img src="attachments/Screenshot%202025-05-19%20at%207.26.55%E2%80%AFAM.png" alt="gke cluster" width="700" />
 <img src="attachments/Screenshot%202025-05-19%20at%207.27.05%E2%80%AFAM.png" alt="cloud shell ip" width="700" />
 
+### 5.2. 有使用cloud-sql-proxy，需先在GKE匯入credentials(只需執行一次)
 >將以下相關腳本上傳到cloud shell
-
 >.config/gcloudsql/cloudsql-sa-key.json
+>在 cloud shell執行
+```bash
+kubectl delete secret cloudsql-sa-key --ignore-not-found
+kubectl create secret generic cloudsql-sa-key --from-file=credentials.json=cloudsql-sa-key.json
+```
 
+### 5.3. 部署應用程式到 GKE
+>將以下相關腳本上傳到cloud shell
 >sh/deploy-to-gke.sh
-
 >yaml/*
-
 >在 cloud shell執行 `deploy-to-gke.sh`，內容如下：
 ```bash
 ./deploy-to-gke.sh
