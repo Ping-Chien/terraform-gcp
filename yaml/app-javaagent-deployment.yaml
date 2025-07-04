@@ -66,25 +66,21 @@ spec:
               value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
-            # OTEL_METRICS_EXPORTER : none.otlp
             - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
               value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"  
-            - name: OTEL_METRICS_EXPORTER
-              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER  # OTEL_METRICS_EXPORTER : none.otlp
+              value: "otlp" 
             - name: OTEL_METRIC_EXPORT_INTERVAL
               value: "60000"
-            # OTEL_JAVAAGENT_LOGGING : simple,application
-            # OTEL_LOGS_EXPORTER : none,otlp
-            - name: OTEL_LOGS_EXPORTER
+            - name: OTEL_LOGS_EXPORTER # OTEL_LOGS_EXPORTER : none,otlp
               value: "otlp"
-            - name: OTEL_JAVAAGENT_LOGGING
+            - name: OTEL_JAVAAGENT_LOGGING # OTEL_JAVAAGENT_LOGGING : simple,application
               value: "simple"
-            # OTEL_TRACES_EXPORTER : none,otlp
-            - name: OTEL_TRACES_EXPORTER
+            - name: OTEL_TRACES_EXPORTER  # OTEL_TRACES_EXPORTER : none,otlp
               value: "otlp"
             - name: OTEL_TRACES_SAMPLER
               value: "traceidratio"
-            - name: OTEL_TRACES_SAMPLER_ARG
+            - name: OTEL_TRACES_SAMPLER_ARG # OTEL_TRACES_SAMPLER_ARG : 0.25, 0.5, 0.75, 1.0
               value: "1.0"
             
           ports:
