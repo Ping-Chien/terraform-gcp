@@ -20,7 +20,7 @@ spec:
 
       initContainers:
       - name: otel-agent-init
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-dotnet-agent:v3
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-agent-init:v1
         volumeMounts:
         - name: otel-agent-volume
           mountPath: /otel-agent
@@ -32,7 +32,7 @@ spec:
           echo "Copied OpenTelemetry agent files and set permissions"
       containers:
       - name: dotnet-backend
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/dotnet-backend:mysqlv5
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/dotnet-backend:v1
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -41,14 +41,16 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - |
-          /otel-agent/instrument.sh dotnet dotnet-backend.dll
+          /otel-agent/dotnet/instrument.sh dotnet dotnet-backend.dll
         env:
         - name: OTEL_DOTNET_AUTO_HOME
-          value: "/otel-agent"
+          value: "/otel-agent/dotnet"
         - name: OTEL_SERVICE_NAME
           value: "dotnet-backend"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: "http://otel-collector.opentelemetry.svc.cluster.local:4318"
+          value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "grpc"
         - name: OTEL_TRACES_EXPORTER
           value: "otlp,console"
         - name: OTEL_METRICS_EXPORTER
@@ -59,7 +61,7 @@ spec:
         image: gcr.io/cloudsql-docker/gce-proxy:1.37
         command:
           - "/cloud_sql_proxy"
-          - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:3306"
+          - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
         ports:
-        - containerPort: 3306
+        - containerPort: 5432
       serviceAccountName: dotnet-backend
