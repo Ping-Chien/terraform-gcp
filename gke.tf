@@ -2,7 +2,12 @@
 resource "google_project_iam_member" "autopilot_artifact_registry_reader" {
   project = var.project_id
   role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:11269261557-compute@developer.gserviceaccount.com"
+  # todo: 應該要改成 GKE建立後再授予權限
+  # GKE Autopilot 預設 Service Account
+  # 注意：這個 Service Account 是 GKE Autopilot 自動建立的，
+  # 並且會隨著 GKE 叢集的建立而自動產生。
+  # 這裡使用了 GKE Autopilot 的預設 Service Account
+  member  = "serviceAccount:569131904631-compute@developer.gserviceaccount.com" 
 }
 
 resource "google_container_cluster" "primary" {
