@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/tracing-test:push-mode
+          image: asia-east1-docker.pkg.dev/cloud-sre-poc-465509/app-image-repo/tracing-test:push-mode
           imagePullPolicy: Always
           resources:
             limits:
@@ -60,7 +60,7 @@ spec:
               memory: 128Mi
           command: ["/cloud_sql_proxy"]
           args:
-            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
+            - "-instances=cloud-sre-poc-465509:asia-east1:tracing=tcp:5432"
             - "-credential_file=/secrets/cloudsql/credentials.json"
           volumeMounts:
             - name: cloudsql-instance-credentials

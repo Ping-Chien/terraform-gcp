@@ -4,7 +4,7 @@
 
       initContainers:
       - name: otel-agent-init
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-agent-init:v1
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-465509/app-image-repo/otel-agent-init:v1
         volumeMounts:
         - name: otel-agent-volume
           mountPath: /otel-agent

@@ -78,4 +78,4 @@ metadata:
   name: k6-sa
   namespace: default
   annotations:
-    iam.gke.io/gcp-service-account: k6-gcp-sa@cloud-sre-poc-447001.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: k6-gcp-sa@cloud-sre-poc-465509.iam.gserviceaccount.com

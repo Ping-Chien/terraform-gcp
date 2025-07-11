@@ -60,7 +60,7 @@ spec:
               cpu: 200m
               memory: 128Mi
           args:
-            - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
+            - "-instances=cloud-sre-poc-465509:asia-east1:tracing=tcp:5432"
             - "-credential_file=/secrets/cloudsql/credentials.json"
           volumeMounts:
             - name: cloudsql-instance-credentials

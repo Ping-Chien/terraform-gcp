@@ -20,7 +20,7 @@ spec:
 
       initContainers:
       - name: otel-agent-init
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/otel-dotnet-agent:v3
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-465509/app-image-repo/otel-dotnet-agent:v3
         volumeMounts:
         - name: otel-agent-volume
           mountPath: /otel-agent
@@ -32,7 +32,7 @@ spec:
           echo "Copied OpenTelemetry agent files and set permissions"
       containers:
       - name: dotnet-backend
-        image: asia-east1-docker.pkg.dev/cloud-sre-poc-447001/app-image-repo/dotnet-backend:mysqlv5
+        image: asia-east1-docker.pkg.dev/cloud-sre-poc-465509/app-image-repo/dotnet-backend:mysqlv5
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -59,7 +59,7 @@ spec:
         image: gcr.io/cloudsql-docker/gce-proxy:1.37
         command:
           - "/cloud_sql_proxy"
-          - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:3306"
+          - "-instances=cloud-sre-poc-465509:asia-east1:tracing=tcp:3306"
         ports:
         - containerPort: 3306
       serviceAccountName: dotnet-backend

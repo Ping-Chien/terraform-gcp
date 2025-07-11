@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "GCP project ID"
   type        = string
-  default     = "cloud-sre-poc-447001"
+  default     = "cloud-sre-poc-465509"
 }
 
 variable "region" {
@@ -27,5 +27,5 @@ variable "dotnet_password" {
 variable "gcp_credentials_file" {
   description = "Path to GCP credentials json file"
   type        = string
-  default     = ".config/gcloud/cloud-sre-poc-447001-5ee27f179112.json"
+  default     = ".config/gcloud/cloud-sre-poc-465509-90134ef8cb5d.json"
 }

@@ -2,7 +2,7 @@
 # 透過 gcloud 取得 GKE 認證並部署 yaml 到 GKE
 # 請先設定下方三個變數
 
-PROJECT_ID="cloud-sre-poc-447001"
+PROJECT_ID="cloud-sre-poc-465509"
 REGION="asia-east1"
 CLUSTER_NAME="tracing-gke-cluster"
 

@@ -18,6 +18,7 @@
 
 ## GCP 啟用服務API(GCP Lab已啟用)
 請至 GCP Console `API & Services`啟用以下 API：
+- Cloud Resource Manager API
 - Artifact Registry API
 - Cloud SQL API
 - Cloud SQL Admin API
@@ -27,7 +28,7 @@
 - Serverless VPC Access API
 - Cloud Run Admin API
 
-## GCP 認證設定(GCP Lab已設定，service account= terraform-tracing-creator@cloud-sre-poc-447001.iam.gserviceaccount.com，請下載新的金鑰)
+## GCP 認證設定(GCP Lab已設定，service account= terraform-tracing-creator@cloud-sre-poc-465509.iam.gserviceaccount.com，請下載新的金鑰)
 1. 請至 GCP Console 建立具備必要權限的 Service Account，並產生金鑰（JSON 檔）。
 service account 必須具備以下role
 - Artifact Registry 管理員：roles/artifactregistry.admin
@@ -38,8 +39,9 @@ service account 必須具備以下role
 - 服務帳戶管理員：roles/iam.serviceAccountAdmin
 - 服務帳戶金鑰管理員：roles/iam.serviceAccountKeyAdmin
 - 服務帳戶使用者：roles/iam.serviceAccountUser
-- 網路管理員：roles/compute.networkViewer
-- 網路安全管理員：roles/compute.securityAdmin
+- Compute網路Viewer：roles/compute.networkViewer
+- Compute網路管理員：roles/compute.networkAdmin
+- Compute安全管理員：roles/compute.securityAdmin
 
 2. 將下載的金鑰檔案放置於此專案 `.config/gcloud/` 目錄下，例如：`.config/gcloud/${下載的credentials檔名}.json`
 

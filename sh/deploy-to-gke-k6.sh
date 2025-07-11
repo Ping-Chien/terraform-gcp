@@ -4,7 +4,7 @@
 set -e
 
 # 變數設置 - 請根據實際情況修改
-PROJECT_ID="cloud-sre-poc-447001"  # GCP 項目 ID
+PROJECT_ID="cloud-sre-poc-465509"  # GCP 項目 ID
 REGION="asia-east1"                # GKE 集群所在區域
 CLUSTER_NAME="tracing-gke-cluster"         # GKE 集群名稱
 SERVICE_ACCOUNT="k6-gcp-sa"        # GCP 服務帳號名稱

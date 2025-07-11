@@ -2,7 +2,7 @@
 # 將本地 docker.io/library/tracing-test:latest 推送到 Google Artifact Registry
 # 使用前請先將 <YOUR_PROJECT_ID> 與 <REGION> 替換為你的實際專案與區域
 
-PROJECT_ID="cloud-sre-poc-447001"
+PROJECT_ID="cloud-sre-poc-465509"
 REGION="asia-east1"
 REPO="app-image-repo"
 IMAGE_NAME_app="tracing-test"

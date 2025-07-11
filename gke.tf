@@ -1,29 +1,8 @@
-# 1. 建立 GCP Service Account
-resource "google_service_account" "k8s_default" {
-  account_id   = "k8s-default"
-  display_name = "K8s Default Service Account for GKE"
-  project      = var.project_id
-}
-
-# 2. 賦予 Artifact Registry Reader 權限
-resource "google_project_iam_member" "artifact_registry_reader" {
-  project = var.project_id
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:${google_service_account.k8s_default.email}"
-}
-
 # 授權 GKE Autopilot 預設 Service Account Artifact Registry Reader 權限
 resource "google_project_iam_member" "autopilot_artifact_registry_reader" {
   project = var.project_id
   role    = "roles/artifactregistry.reader"
   member  = "serviceAccount:11269261557-compute@developer.gserviceaccount.com"
-}
-
-# 3. Workload Identity 綁定 K8s default ServiceAccount
-resource "google_service_account_iam_member" "workload_identity_user" {
-  service_account_id = google_service_account.k8s_default.name
-  role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/default]"
 }
 
 resource "google_container_cluster" "primary" {
