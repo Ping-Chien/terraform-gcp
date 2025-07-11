@@ -58,27 +58,29 @@ spec:
             # Java Agent
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/otel-agent/java/opentelemetry-javaagent.jar"
-            - name: OTEL_METRIC_EXPORT_INTERVAL
-              value: "60000"
+            - name: OTEL_SERVICE_NAME
+              value: "${APP_NAME}"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "service.name=${APP_NAME},service.version=1.0,gcp.log_name=${APP_NAME}-log"  
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
-            - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-              value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
-            - name: OTEL_METRICS_EXPORTER
-              value: "otlp"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
-            - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=${APP_NAME},service.version=1.0,gcp.log_name=${APP_NAME}-log"
-            - name: OTEL_TRACES_EXPORTER
+            - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+              value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"  
+            - name: OTEL_METRICS_EXPORTER  # OTEL_METRICS_EXPORTER : none.otlp
+              value: "otlp" 
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "60000"
+            - name: OTEL_LOGS_EXPORTER # OTEL_LOGS_EXPORTER : none,otlp
               value: "otlp"
-            - name: OTEL_LOGS_EXPORTER
-              value: "otlp"
-            - name: OTEL_JAVAAGENT_LOGGING
+            - name: OTEL_JAVAAGENT_LOGGING # OTEL_JAVAAGENT_LOGGING : simple,application
               value: "simple"
+            - name: OTEL_TRACES_EXPORTER  # OTEL_TRACES_EXPORTER : none,otlp
+              value: "otlp"
             - name: OTEL_TRACES_SAMPLER
               value: "traceidratio"
-            - name: OTEL_TRACES_SAMPLER_ARG
+            - name: OTEL_TRACES_SAMPLER_ARG # OTEL_TRACES_SAMPLER_ARG : 0.25, 0.5, 0.75, 1.0
               value: "1.0"
             
           ports:

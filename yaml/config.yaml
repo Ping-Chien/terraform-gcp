@@ -29,6 +29,7 @@ data:
 
     exporters:
       debug:
+        verbosity: "detailed"
       googlecloud:
         metric:
           prefix: "custom.googleapis.com/opentelemetry/"
@@ -38,6 +39,9 @@ data:
           default_log_name: "otel-logs"
 
     service:
+      telemetry:
+        logs:
+          level: "debug"
       pipelines:
         traces:
           receivers: [otlp,zipkin]
