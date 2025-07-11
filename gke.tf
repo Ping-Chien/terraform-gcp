@@ -10,6 +10,12 @@ resource "google_project_iam_member" "autopilot_artifact_registry_reader" {
   member  = "serviceAccount:569131904631-compute@developer.gserviceaccount.com" 
 }
 
+resource "google_project_iam_member" "autopilot_logging" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:569131904631-compute@developer.gserviceaccount.com"
+}
+
 resource "google_container_cluster" "primary" {
   name     = "tracing-gke-cluster"
   location = var.region
