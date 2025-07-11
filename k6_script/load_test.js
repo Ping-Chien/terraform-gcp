@@ -20,7 +20,7 @@ export const options = {
       timeUnit: '1s',
       duration: '5m', // 總共運行1分鐘（60秒），約產生60次請求
       preAllocatedVUs: 10, // 開始時分配10個虛擬用戶（VU）
-      maxVUs: 50, // 如有需要，可增加到最多50個VU來維持請求速率
+      maxVUs: 1000, // 如有需要，可增加到最多1000個VU來維持請求速率
       gracefulStop: '0s'
     }
   },
@@ -34,7 +34,7 @@ export const options = {
 // Main test function
 export default function () {
   // Target endpoint
-  const url = 'http://app1.default.svc.cluster.local:8080/call-other?podUrl=http://app2.default.svc.cluster.local:8080';
+  const url = 'http://app3-stress.default.svc.cluster.local:8080/call-other?podUrl=http://app4-stress.default.svc.cluster.local:8080';
   
   // Send request
   const response = http.get(url);
