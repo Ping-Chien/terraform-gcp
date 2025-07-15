@@ -60,8 +60,10 @@ spec:
               value: "-javaagent:/otel-agent/java/opentelemetry-javaagent.jar"
             - name: OTEL_SERVICE_NAME
               value: "${APP_NAME}"
+            - name: OTEL_RESOURCE_PROVIDERS_GCP_ENABLED
+              value: "true"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=${APP_NAME},service.version=1.0,gcp.log_name=${APP_NAME}-log"  
+              value: "service.name=${APP_NAME},service.version=1.0,gcp.log_name=${APP_NAME}-log,k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(NAMESPACE_NAME),k8s.container.name=$(CONTAINER_NAME)"  
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL

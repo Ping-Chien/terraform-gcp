@@ -45,11 +45,11 @@ data:
       #           name: k8s.pod.uid
       #     - sources: # If neither of those work, use the request's connection to get the pod IP.
       #         - from: connection 
-      transform:
-          metric_statements:
-          - context: resource
-            statements:
-              - set(attributes["service.instance.id"], attributes["host.name"])
+      # transform:
+      #     metric_statements:
+      #     - context: resource
+      #       statements:
+      #         - set(attributes["service.instance.id"], attributes["host.name"])
 
     exporters:
       debug:
@@ -73,7 +73,7 @@ data:
           exporters: [googlecloud]
         metrics:  
           receivers: [otlp]
-          processors: [transform ,batch]  
+          processors: [batch]  
           exporters: [googlecloud]  
         logs:
           receivers: [otlp]
