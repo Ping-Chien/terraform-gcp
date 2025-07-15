@@ -84,6 +84,10 @@ spec:
               value: "traceidratio"
             - name: OTEL_TRACES_SAMPLER_ARG # OTEL_TRACES_SAMPLER_ARG : 0.25, 0.5, 0.75, 1.0
               value: "1.0"
+            - name: OTEL_INSTRUMENTATION_MICROMETER_ENABLED
+              value: "true"
+            - name: OTEL_INSTRUMENTATION_RUNTIME_TELEMETRY_ENABLED
+              value: "false"
             
           ports:
             - containerPort: 8080
