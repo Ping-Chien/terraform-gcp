@@ -31,13 +31,26 @@ export const options = {
   },
 };
 
+let baseId = 3;
+
 // Main test function
 export default function () {
-  // Target endpoint
-  const url = 'http://app1.default.svc.cluster.local:8080/call-other?podUrl=http://app2.default.svc.cluster.local:8080';
-  
-  // Send request
-  const response = http.get(url);
+  let id = baseId + __ITER;
+    let url = 'http://dotnet-frontend-4znqw.default.svc.cluster.local:8080/submit';
+    let payload = JSON.stringify({
+        url: "http://dotnet-backend-service.default.svc.cluster.local:8080/employees",
+        name: "chen",
+        tel: "0987654321",
+        id: id
+    });
+
+    let params = {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    let res = http.post(url, payload, params);x
   
   // 記錄交易開始時間
   const startTime = new Date();

@@ -1,0 +1,141 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: opentelemetry
+data:
+  otel-collector-config.yaml: |
+
+    # 接收器配置：定義如何接收來自各種來源的遙測資料
+    receivers:
+      # OTLP 接收器：接收 OpenTelemetry Protocol 標準格式的資料
+      otlp:
+        protocols:
+          grpc:                      # gRPC 協議配置
+            endpoint: "0.0.0.0:4317" # gRPC 監聽地址，標準 OTLP gRPC 端口
+          http:                      # HTTP 協議配置
+            endpoint: "0.0.0.0:4318" # HTTP 監聽地址，標準 OTLP HTTP 端口
+      
+      # Zipkin 接收器：接收 Zipkin 格式的分散式追蹤資料
+      zipkin:
+        endpoint: "0.0.0.0:9411"     # Zipkin 協議監聽地址，標準 Zipkin 端口
+
+    # 處理器配置：定義如何處理、轉換和過濾遙測資料
+    processors:
+      # 記憶體限制器：防止 Collector 記憶體使用過量導致 OOM
+      memory_limiter:
+        limit_mib: 1024              # 記憶體使用硬限制 (1GB)
+        spike_limit_mib: 256         # 記憶體峰值限制 (256MB)
+        check_interval: 5s           # 記憶體檢查間隔時間
+      
+      # 尾部取樣處理器：基於完整 trace 資訊進行智能取樣決策
+      tail_sampling:
+        decision_wait: 30s           # 等待完整 trace 的最大時間
+        num_traces: 500              # 批次處理的追蹤數量（適合中等流量）
+        expected_new_traces_per_sec: 50  # 預期每秒新增追蹤數（用於記憶體優化
+        policies:                    # 取樣策略清單（按優先順序執行）
+          # 策略1：錯誤追蹤 - 保留所有包含錯誤的追蹤
+          - name: error_traces       # 策略名稱
+            type: status_code        # 基於 span 狀態碼的取樣
+            status_code:
+              status_codes: [ERROR]  # 保留所有 ERROR 狀態的追蹤
+          
+          # 策略2：高延遲追蹤 - 保留響應時間較長的追蹤
+          - name: high_latency       # 策略名稱
+            type: latency            # 基於延遲時間的取樣
+            latency:
+              threshold_ms: 500      # 保留延遲超過 500ms 的追蹤
+          
+          # 策略3：重要業務操作 - 保留關鍵業務功能的追蹤
+          - name: important_operations  # 策略名稱
+            type: string_attribute   # 基於字串屬性的取樣
+            string_attribute:
+              key: "operation.name"  # 檢查的屬性鍵
+              values: ["login", "payment", "checkout"]  # 重要操作清單
+          
+          # 策略4：機率取樣 - 對其他正常追蹤進行隨機取樣
+          - name: probabilistic_sampling  # 策略名稱
+            type: probabilistic      # 機率取樣類型
+            probabilistic:
+              sampling_percentage: 5  # 對其他追蹤進行 5% 的隨機取樣
+      
+      # 批次處理器：將資料批次化以提高網路傳輸效率
+      batch:
+        timeout: 60s                 # 批次處理的最大等待時間
+        send_batch_size: 1000        # 標準批次大小（筆數）
+        send_batch_max_size: 1500    # 最大批次大小（防止過大的批次）
+      
+      # 過濾器處理器：使用 OTTL 語言過濾不需要的資料
+      filter/ottl:
+        error_mode: ignore           # 過濾錯誤時的處理模式（忽略錯誤繼續處理）
+        traces:                      # 針對追蹤資料的過濾規則
+          span:                      # 在 span 層級進行過濾
+            # 過濾掉健康檢查相關的請求（減少無用資料）
+            - 'attributes["url.path"] == "/actuator/health/readiness"'
+            - 'attributes["url.path"] == "/actuator/health/liveness"'
+            # 過濾掉常見的靜態資源請求
+            - 'attributes["url.path"] == "/favicon.ico"'
+            # 過濾掉 OPTIONS 預檢請求
+            - 'attributes["http.method"] == "OPTIONS"'
+
+    # 匯出器配置：定義如何匯出處理後的遙測資料
+    exporters:
+      # Google Cloud 匯出器：將資料傳送到 Google Cloud Operations Suite
+      googlecloud:
+        # 重試機制配置：處理網路問題和暫時性錯誤
+        retry_on_failure:
+          enabled: true              # 啟用重試機制
+          initial_interval: 5s       # 初始重試間隔
+          max_interval: 30s          # 最大重試間隔
+          max_elapsed_time: 300s     # 最大重試總時間（5分鐘）
+        
+        # 傳送佇列配置：提高傳送效率和可靠性
+        sending_queue:
+          enabled: true              # 啟用傳送佇列
+          num_consumers: 10          # 並行消費者數量
+          queue_size: 5000           # 佇列大小
+        
+        timeout: 30s                 # 單次請求超時時間
+        
+        # 指標資料配置
+        metric:
+          prefix: "custom.googleapis.com/opentelemetry/"  # 自訂指標前綴
+          resource_filters:          # 資源過濾器（減少標籤基數）
+            - prefix: "k8s_container"  # 過濾 Kubernetes 容器相關資源
+        
+        # 日誌資料配置
+        log:
+          default_log_name: "otel-logs"  # 預設日誌名稱
+
+    # 服務配置：定義 Collector 本身的行為和資料管線
+    service:
+      
+      # Collector 自身的遙測配置
+      telemetry:
+        logs:
+          level: "info"              # 日誌級別（生產環境建議使用 info）
+        metrics:
+          address: "0.0.0.0:8888"    # Collector 自身指標匯出地址
+      
+      # 資料管線配置：定義資料流向和處理順序
+      pipelines:
+        # 追蹤資料管線
+        traces:
+          receivers: [otlp, zipkin]  # 資料來源：OTLP 和 Zipkin 接收器
+          # 處理器執行順序：記憶體限制 → 過濾 → 批次處理 → 尾部取樣
+          processors: [memory_limiter, filter/ottl, batch, tail_sampling]
+          exporters: [googlecloud]   # 資料輸出：Google Cloud
+        
+        # 指標資料管線
+        metrics:
+          receivers: [otlp]          # 資料來源：OTLP 接收器
+          # 處理器執行順序：記憶體限制 → 批次處理
+          processors: [memory_limiter, batch]
+          exporters: [googlecloud]   # 資料輸出：Google Cloud
+        
+        # 日誌資料管線
+        logs:
+          receivers: [otlp]          # 資料來源：OTLP 接收器
+          # 處理器執行順序：記憶體限制 → 批次處理
+          processors: [memory_limiter, batch]
+          exporters: [googlecloud]   # 資料輸出：Google Cloud

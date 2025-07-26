@@ -5,6 +5,7 @@ metadata:
   namespace: opentelemetry
 data:
   otel-collector-config.yaml: |
+
     receivers:
       otlp:
         protocols:
@@ -26,6 +27,36 @@ data:
           span:
             - attributes["url.path"] == "/actuator/health/readiness"
             - attributes["url.path"] == "/actuator/health/liveness"  
+      # 尾部取樣處理器：基於完整 trace 資訊進行智能取樣決策
+      tail_sampling:
+        decision_wait: 30s           # 等待完整 trace 的最大時間
+        num_traces: 500              # 批次處理的追蹤數量（適合中等流量）
+        expected_new_traces_per_sec: 50  # 預期每秒新增追蹤數（用於記憶體優化）
+        policies:                    # 取樣策略清單（按優先順序執行）
+          # 策略1：錯誤追蹤 - 保留所有包含錯誤的追蹤
+          - name: error_traces       # 策略名稱
+            type: status_code        # 基於 span 狀態碼的取樣
+            status_code:
+              status_codes: [ERROR]  # 保留所有 ERROR 狀態的追蹤
+          
+          # 策略2：高延遲追蹤 - 保留響應時間較長的追蹤
+          - name: high_latency       # 策略名稱
+            type: latency            # 基於延遲時間的取樣
+            latency:
+              threshold_ms: 500      # 保留延遲超過 500ms 的追蹤
+          
+          # 策略3：重要業務操作 - 保留關鍵業務功能的追蹤
+          - name: important_operations  # 策略名稱
+            type: string_attribute   # 基於字串屬性的取樣
+            string_attribute:
+              key: "operation.name"  # 檢查的屬性鍵
+              values: ["login", "payment", "checkout"]  # 重要操作清單
+          
+          # 策略4：機率取樣 - 對其他正常追蹤進行隨機取樣
+          - name: probabilistic_sampling  # 策略名稱
+            type: probabilistic      # 機率取樣類型
+            probabilistic:
+              sampling_percentage: 5  # 對其他追蹤進行 5% 的隨機取樣
 
     exporters:
       debug:
@@ -45,7 +76,7 @@ data:
       pipelines:
         traces:
           receivers: [otlp,zipkin]
-          processors: [filter/ottl, batch]
+          processors: [filter/ottl, batch, tail_sampling]
           exporters: [googlecloud]
         metrics:  
           receivers: [otlp]

@@ -32,11 +32,4 @@ spec:
           value: "otlp,console"
         - name: OTEL_LOGS_EXPORTER
           value: "otlp,console"
-      - name: sql-auth-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.37
-        command:
-          - "/cloud_sql_proxy"
-          - "-instances=cloud-sre-poc-447001:asia-east1:tracing=tcp:5432"
-        ports:
-        - containerPort: 5432
       serviceAccountName: dotnet-backend

@@ -1,5 +1,5 @@
-PROJECT_ID="cloud-sre-poc-465509"
-SERVICEACCOUNT="dotnet-backend"
+PROJECT_ID="cloud-sre-poc-447001"
+SERVICEACCOUNT="dotnet-frontend"
 NAMESPACE="default"
 
 kubectl create serviceaccount $SERVICEACCOUNT --namespace=$NAMESPACE

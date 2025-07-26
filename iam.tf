@@ -22,8 +22,13 @@ resource "google_project_iam_member" "otel_tracing" {
 }
 
 resource "google_service_account" "dotnet_sa" {
-  account_id   = "dotnet-backend" # 這會產生 otel-svc-account@PROJECT_ID.iam.gserviceaccount.com
+  account_id   = "dotnet-backend"
   display_name = "dotnet-backend Service Account"
+}
+
+resource "google_service_account" "dotnet_frontend_sa" {
+  account_id   = "dotnet-frontend"
+  display_name = "dotnet-frontend Service Account"
 }
 
 resource "google_project_iam_member" "dotnet_cloud_sql_admin" {
